@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+files:
+  - source: /index.html
+    destination: /var/www/html/
+  # NEU: Das Injektions-Skript MUSS auch im Paket sein
+  - source: /scripts/cleanup.sh
+    destination: /opt/codedeploy-agent/deployment-root/scripts/
+  - source: /scripts/inject_id.sh
+    destination: /opt/codedeploy-agent/deployment-root/scripts/
+
+hooks:
+  BeforeInstall:
+    - location: scripts/cleanup.sh # Loescht die alte Datei
+      timeout: 300
+      runas: root
+  
+  ApplicationStart:
+    # NEU: Fuehrt das Skript aus, um die ID in die gerade kopierte HTML-Datei zu schreiben
+    - location: scripts/inject_id.sh
+      timeout: 300
+      runas: root
